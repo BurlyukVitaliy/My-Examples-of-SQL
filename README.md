@@ -8,5 +8,6 @@ from the table of values of periodic details, from tables of subordinate referen
 The file "Deleting_documents_that_ have_no_links_in_database_tables.txt" is a script in 1C version 7.7. 
 The script deletes documents that are not referenced in database tables. Used after pruning large databases.
 Previously, entries in the operational and accounting registers were deleted before a certain date.
+Replaces the standard procedure for deleting records marked for deletion, which takes a very long time
 
 The file task24_6_8_Black_Jack.py is a text mode implementation of Black Jack. There is a condition of the problem and its solution
