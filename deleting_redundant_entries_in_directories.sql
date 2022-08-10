@@ -1,20 +1,20 @@
 -- Removal from a number of directories of records that do not have links in database tables
 use work;
 GO
---!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!СМ. переменные @rejim, @spr, @data_svertki
--- надо выставить дату свертки @data_svertki (нужна для спр-ка ТМЦ). Для удаления объектов режим (@rejim) должен быть "Удаление"
---в @spr - справочники, в которых надо удалять ненужные элементы
---будут удалены подчиненные спр-ки и периодические ревизиты основного спр-ка и подчиненных
+--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!РЎРњ. РїРµСЂРµРјРµРЅРЅС‹Рµ @rejim, @spr, @data_svertki
+-- РЅР°РґРѕ РІС‹СЃС‚Р°РІРёС‚СЊ РґР°С‚Сѓ СЃРІРµСЂС‚РєРё @data_svertki (РЅСѓР¶РЅР° РґР»СЏ СЃРїСЂ-РєР° РўРњР¦). Р”Р»СЏ СѓРґР°Р»РµРЅРёСЏ РѕР±СЉРµРєС‚РѕРІ СЂРµР¶РёРј (@rejim) РґРѕР»Р¶РµРЅ Р±С‹С‚СЊ "РЈРґР°Р»РµРЅРёРµ"
+--РІ @spr - СЃРїСЂР°РІРѕС‡РЅРёРєРё, РІ РєРѕС‚РѕСЂС‹С… РЅР°РґРѕ СѓРґР°Р»СЏС‚СЊ РЅРµРЅСѓР¶РЅС‹Рµ СЌР»РµРјРµРЅС‚С‹
+--Р±СѓРґСѓС‚ СѓРґР°Р»РµРЅС‹ РїРѕРґС‡РёРЅРµРЅРЅС‹Рµ СЃРїСЂ-РєРё Рё РїРµСЂРёРѕРґРёС‡РµСЃРєРёРµ СЂРµРІРёР·РёС‚С‹ РѕСЃРЅРѕРІРЅРѕРіРѕ СЃРїСЂ-РєР° Рё РїРѕРґС‡РёРЅРµРЅРЅС‹С…
 
 declare @data_svertki varchar(10);
 set @data_svertki='20201231';
 declare @rejim varchar(10);
-set @rejim='Тест';
+set @rejim='РўРµСЃС‚';
 declare @spr varchar(150);
-set @spr= 'vid_obj in (''Пользователи'',''Инвестиции'',''МестаХранения'',''НеоборотныеАктивы'',''ТМЦ'')';
+set @spr= 'vid_obj in (''РџРѕР»СЊР·РѕРІР°С‚РµР»Рё'',''РРЅРІРµСЃС‚РёС†РёРё'',''РњРµСЃС‚Р°РҐСЂР°РЅРµРЅРёСЏ'',''РќРµРѕР±РѕСЂРѕС‚РЅС‹РµРђРєС‚РёРІС‹'',''РўРњР¦'')';
 declare @prist varchar(10);
 declare @prist1 varchar(25);
-if @rejim='Тест' 
+if @rejim='РўРµСЃС‚' 
 	begin
 		set @prist=' SELECT * '
 		set @prist1=' SELECT distinct * '
@@ -51,13 +51,13 @@ declare @period int;
 declare @period2 int;
 
 
---сначала таблицу с реквизитами неопред. типа (вообще или справочник непоределенного вида)
+--СЃРЅР°С‡Р°Р»Р° С‚Р°Р±Р»РёС†Сѓ СЃ СЂРµРєРІРёР·РёС‚Р°РјРё РЅРµРѕРїСЂРµРґ. С‚РёРїР° (РІРѕРѕР±С‰Рµ РёР»Рё СЃРїСЂР°РІРѕС‡РЅРёРє РЅРµРїРѕСЂРµРґРµР»РµРЅРЅРѕРіРѕ РІРёРґР°)
 set @StringSQL ='';
 if object_id(N'tempdb..#ft_neopr',N'U') IS NOT NULL
 DROP TABLE #ft_neopr;
---объявляем курсор с ревизитами неопреленного типа
+--РѕР±СЉСЏРІР»СЏРµРј РєСѓСЂСЃРѕСЂ СЃ СЂРµРІРёР·РёС‚Р°РјРё РЅРµРѕРїСЂРµР»РµРЅРЅРѕРіРѕ С‚РёРїР°
 DECLARE user_cursor CURSOR FOR SELECT (RTRIM(prist_obj)+RTRIM(id_obj)) AS obj, 
-	(RTRIM(prist_rekv)+RTRIM(id_rekv)) AS rekv, tip_rekv  from metad where (tip_rekv='Неопределенный')  or (tip_rekv='Справочник' and vid_rekv='')
+	(RTRIM(prist_rekv)+RTRIM(id_rekv)) AS rekv, tip_rekv  from metad where (tip_rekv='РќРµРѕРїСЂРµРґРµР»РµРЅРЅС‹Р№')  or (tip_rekv='РЎРїСЂР°РІРѕС‡РЅРёРє' and vid_rekv='')
 
 	OPEN user_cursor;  
 	set @StringSQL ='';
@@ -65,9 +65,9 @@ DECLARE user_cursor CURSOR FOR SELECT (RTRIM(prist_obj)+RTRIM(id_obj)) AS obj,
 	set @StringSQL_='';
 	FETCH NEXT FROM user_cursor  
 	INTO @obj, @rekv,@tip_rekv; 
-	-- делаем запросы по всем таблицам и реквизитам, у которых есть неопр. вид 
-	--с целью получения 36-ричных значений видов справочников. Загрузим их во врем. таблицу.
-	-- будет видно в какой таблице-реквизите есть элементы какого вида справочника
+	-- РґРµР»Р°РµРј Р·Р°РїСЂРѕСЃС‹ РїРѕ РІСЃРµРј С‚Р°Р±Р»РёС†Р°Рј Рё СЂРµРєРІРёР·РёС‚Р°Рј, Сѓ РєРѕС‚РѕСЂС‹С… РµСЃС‚СЊ РЅРµРѕРїСЂ. РІРёРґ 
+	--СЃ С†РµР»СЊСЋ РїРѕР»СѓС‡РµРЅРёСЏ 36-СЂРёС‡РЅС‹С… Р·РЅР°С‡РµРЅРёР№ РІРёРґРѕРІ СЃРїСЂР°РІРѕС‡РЅРёРєРѕРІ. Р—Р°РіСЂСѓР·РёРј РёС… РІРѕ РІСЂРµРј. С‚Р°Р±Р»РёС†Сѓ.
+	-- Р±СѓРґРµС‚ РІРёРґРЅРѕ РІ РєР°РєРѕР№ С‚Р°Р±Р»РёС†Рµ-СЂРµРєРІРёР·РёС‚Рµ РµСЃС‚СЊ СЌР»РµРјРµРЅС‚С‹ РєР°РєРѕРіРѕ РІРёРґР° СЃРїСЂР°РІРѕС‡РЅРёРєР°
 	WHILE @@FETCH_STATUS = 0  
 	BEGIN  
 		if @nom_circle <>1 
@@ -82,7 +82,7 @@ DECLARE user_cursor CURSOR FOR SELECT (RTRIM(prist_obj)+RTRIM(id_obj)) AS obj,
 				end
 			else 
 				set @StringSQL =@StringSQL;
-			If @tip_rekv='Неопределенный'
+			If @tip_rekv='РќРµРѕРїСЂРµРґРµР»РµРЅРЅС‹Р№'
 				set @StringSQL =@StringSQL+'SELECT distinct SUBSTRING('+@rekv+',3,4) AS vid_36,'''+@obj+''' as obj,'''+@rekv+''' as rekv FROM '+@obj+' where LEFT('+@rekv+',2)=''B1''' 
 			else
 				set @StringSQL =@StringSQL+'SELECT distinct LEFT('+@rekv+',4) AS vid_36, '''+@obj+''' as obj,'''+@rekv+''' as rekv FROM '+@obj+' ' ;
@@ -90,7 +90,7 @@ DECLARE user_cursor CURSOR FOR SELECT (RTRIM(prist_obj)+RTRIM(id_obj)) AS obj,
 		FETCH NEXT FROM user_cursor  
 		INTO @obj, @rekv,@tip_rekv;
 	END  
-	print('Реквизиты неопределенного типа');
+	print('Р РµРєРІРёР·РёС‚С‹ РЅРµРѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ С‚РёРїР°');
 	print 'INSERT #ft_neopr Select distinct yy.vid_36,yy.obj, yy.rekv from (' ;
 	print @StringSQL_;
 	print @StringSQL+')  yy order by yy.vid_36,yy.obj, yy.rekv ';
@@ -100,18 +100,18 @@ DECLARE user_cursor CURSOR FOR SELECT (RTRIM(prist_obj)+RTRIM(id_obj)) AS obj,
 	CLOSE user_cursor; 
 	DEALLOCATE user_cursor;  
 	--select * from #ft_neopr
---теперь основная часть
---запрос по нужным справочникам. 
+--С‚РµРїРµСЂСЊ РѕСЃРЅРѕРІРЅР°СЏ С‡Р°СЃС‚СЊ
+--Р·Р°РїСЂРѕСЃ РїРѕ РЅСѓР¶РЅС‹Рј СЃРїСЂР°РІРѕС‡РЅРёРєР°Рј. 
 set @StringSQL = 'DECLARE user_cursor2 CURSOR FOR SELECT distinct md.vid_obj, (RTRIM(md.prist_obj)+RTRIM(md.id_obj)) AS obj
 	,md.kvo_yr,md.vid_36
 	,isnull(md1.period,0) from metad md
 	left join (select distinct (RTRIM(md.prist_obj)+RTRIM(md.id_obj)) AS obj, period from metad md 
 	where period=1) md1 on md1.obj=(RTRIM(md.prist_obj)+RTRIM(md.id_obj))
-	where '+@spr+' and tip_obj<>''ВидСубконто'' 
+	where '+@spr+' and tip_obj<>''Р’РёРґРЎСѓР±РєРѕРЅС‚Рѕ'' 
 	';
 print @StringSQL;
 exec(@StringSQL);
---Список обходим. Ненужные элементы каждого справочника будем удалять. И подчиненые справочники, и период. реквизиты спр-в и подч-х спр-в
+--РЎРїРёСЃРѕРє РѕР±С…РѕРґРёРј. РќРµРЅСѓР¶РЅС‹Рµ СЌР»РµРјРµРЅС‚С‹ РєР°Р¶РґРѕРіРѕ СЃРїСЂР°РІРѕС‡РЅРёРєР° Р±СѓРґРµРј СѓРґР°Р»СЏС‚СЊ. Р РїРѕРґС‡РёРЅРµРЅС‹Рµ СЃРїСЂР°РІРѕС‡РЅРёРєРё, Рё РїРµСЂРёРѕРґ. СЂРµРєРІРёР·РёС‚С‹ СЃРїСЂ-РІ Рё РїРѕРґС‡-С… СЃРїСЂ-РІ
 
 OPEN user_cursor2; 
 FETCH NEXT FROM user_cursor2  
@@ -123,9 +123,9 @@ BEGIN
 	print @vid;
 	--print @vid_362;
 	--print @vid_36;
-	if @vid='''Пользователи''' set @dob = '
+	if @vid='''РџРѕР»СЊР·РѕРІР°С‚РµР»Рё''' set @dob = '
 	UNION ALL  SELECT distinct SP1135 AS ID FROM _1SJOURN ' ELSE set @dob='';
-	if @vid='''ТМЦ''' 
+	if @vid='''РўРњР¦''' 
 		Begin
 			if object_id(N'tempdb..#ft_TMC',N'U') IS NOT NULL
 			DROP TABLE #ft_TMC;
@@ -170,7 +170,7 @@ BEGIN
 	set @StringSQL ='';
 	set @StringSQL_='';
 	set @StringSQL1 ='';
-	--запрос по всем объектам, у реквизитов которого есть такой справочник. 
+	--Р·Р°РїСЂРѕСЃ РїРѕ РІСЃРµРј РѕР±СЉРµРєС‚Р°Рј, Сѓ СЂРµРєРІРёР·РёС‚РѕРІ РєРѕС‚РѕСЂРѕРіРѕ РµСЃС‚СЊ С‚Р°РєРѕР№ СЃРїСЂР°РІРѕС‡РЅРёРє. 
 	set @StringSQL =@StringSQL+'DECLARE user_cursor CURSOR FOR  ';
 	set @StringSQL =@StringSQL+'SELECT (RTRIM(md.prist_obj)+RTRIM(md.id_obj)) AS obj, 
 	(RTRIM(md.prist_rekv)+RTRIM(md.id_rekv)) AS rekv, md.tip_obj,md.tip_rekv,md.vid_rekv 
@@ -178,8 +178,8 @@ BEGIN
 	from metad md 
 	left join #ft_neopr FT ON FT.obj=(RTRIM(md.prist_obj)+RTRIM(md.id_obj)) and FT.rekv=(RTRIM(md.prist_rekv)+RTRIM(md.id_rekv))
 	and FT.vid_36='''+@vid_36+'''
-	where (md.tip_rekv=''Справочник'' and md.vid_rekv='+@vid +')
-	or (md.tip_rekv=''Справочник'' and md.vid_rekv='''') or (md.tip_rekv=''Неопределенный'')
+	where (md.tip_rekv=''РЎРїСЂР°РІРѕС‡РЅРёРє'' and md.vid_rekv='+@vid +')
+	or (md.tip_rekv=''РЎРїСЂР°РІРѕС‡РЅРёРє'' and md.vid_rekv='''') or (md.tip_rekv=''РќРµРѕРїСЂРµРґРµР»РµРЅРЅС‹Р№'')
 	order by md.vid_rekv, md.tip_obj desc ';
 	print @StringSQL;
 	exec(@StringSQL);
@@ -193,7 +193,7 @@ BEGIN
 
 	WHILE @@FETCH_STATUS = 0  
 	BEGIN  
-	--Формируем тест запроса по идам, которых нет в ссылках реквизитов объектов и создаем фильтр по ним. Их можно удалить
+	--Р¤РѕСЂРјРёСЂСѓРµРј С‚РµСЃС‚ Р·Р°РїСЂРѕСЃР° РїРѕ РёРґР°Рј, РєРѕС‚РѕСЂС‹С… РЅРµС‚ РІ СЃСЃС‹Р»РєР°С… СЂРµРєРІРёР·РёС‚РѕРІ РѕР±СЉРµРєС‚РѕРІ Рё СЃРѕР·РґР°РµРј С„РёР»СЊС‚СЂ РїРѕ РЅРёРј. РС… РјРѕР¶РЅРѕ СѓРґР°Р»РёС‚СЊ
 		if @nom_circle <>1 
 			If RTRIM(@vid_rekv)<>''
 				SET @StringSQL =@StringSQL+'
@@ -206,7 +206,7 @@ BEGIN
 				UNION ALL  '
 		ELSE 
 			set @StringSQL =@StringSQL;
-		if @tip_obj<>'ВидСубконто'
+		if @tip_obj<>'Р’РёРґРЎСѓР±РєРѕРЅС‚Рѕ'
 			If RTRIM(@vid_rekv)<>''
 				IF @nom_circle_ = 0 
 					begin
@@ -221,15 +221,15 @@ BEGIN
 				begin
 					if @vid_36_=''
 						GOTO Label_;
-					if @tip_rekv<>'Неопределенный'
+					if @tip_rekv<>'РќРµРѕРїСЂРµРґРµР»РµРЅРЅС‹Р№'
 						set @StringSQL =@StringSQL+'SELECT distinct RIGHT('+@rekv+',9) AS ID FROM '+@obj+' where LEFT('+@rekv+',4)='''+@vid_36+'''' 
 					else
 						set @StringSQL =@StringSQL+'SELECT distinct SUBSTRING('+@rekv+',7,9) AS ID FROM '+@obj+' where LEFT('+@rekv+',2)=''B1'' ';
 				end
 		else
-			--по хорошему было бы проверить вид реквизита субконто в метаданных. Здесь считается, 
-			--что он всегда определен для справочников. Поэтому используется 'left(...)'. 
-			--Субконто "Заказы" имеет тип документа неопределенного вида. Для него надо было бы использовать 'Right(...)'
+			--РїРѕ С…РѕСЂРѕС€РµРјСѓ Р±С‹Р»Рѕ Р±С‹ РїСЂРѕРІРµСЂРёС‚СЊ РІРёРґ СЂРµРєРІРёР·РёС‚Р° СЃСѓР±РєРѕРЅС‚Рѕ РІ РјРµС‚Р°РґР°РЅРЅС‹С…. Р—РґРµСЃСЊ СЃС‡РёС‚Р°РµС‚СЃСЏ, 
+			--С‡С‚Рѕ РѕРЅ РІСЃРµРіРґР° РѕРїСЂРµРґРµР»РµРЅ РґР»СЏ СЃРїСЂР°РІРѕС‡РЅРёРєРѕРІ. РџРѕСЌС‚РѕРјСѓ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ 'left(...)'. 
+			--РЎСѓР±РєРѕРЅС‚Рѕ "Р—Р°РєР°Р·С‹" РёРјРµРµС‚ С‚РёРї РґРѕРєСѓРјРµРЅС‚Р° РЅРµРѕРїСЂРµРґРµР»РµРЅРЅРѕРіРѕ РІРёРґР°. Р”Р»СЏ РЅРµРіРѕ РЅР°РґРѕ Р±С‹Р»Рѕ Р±С‹ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ 'Right(...)'
 			set @StringSQL_ =@StringSQL_+
 			'SELECT Distinct zz.IDSPR FROM (
 			SELECT Distinct left(SC0,9) AS IDSPR 
@@ -274,7 +274,7 @@ Label_:
 		FETCH NEXT FROM user_cursor  
 		INTO @obj, @rekv,@tip_obj,@tip_rekv,@vid_rekv,@vid_36_;
 	END  
-	-- запрос, вставка во врем. таблицу идов, не имеющих ссылок.   
+	-- Р·Р°РїСЂРѕСЃ, РІСЃС‚Р°РІРєР° РІРѕ РІСЂРµРј. С‚Р°Р±Р»РёС†Сѓ РёРґРѕРІ, РЅРµ РёРјРµСЋС‰РёС… СЃСЃС‹Р»РѕРє.   
 	if object_id(N'tempdb..#ft',N'U') IS NOT NULL
 	DROP TABLE #ft;
 	CREATE TABLE #ft (ID CHAR(9) );
@@ -289,7 +289,7 @@ Label_:
 
 	CLOSE user_cursor; 
 	DEALLOCATE user_cursor;  
-	--сначала удаляем подчиненные справочники
+	--СЃРЅР°С‡Р°Р»Р° СѓРґР°Р»СЏРµРј РїРѕРґС‡РёРЅРµРЅРЅС‹Рµ СЃРїСЂР°РІРѕС‡РЅРёРєРё
 	set @StringSQL1 =@StringSQL1+'DECLARE user_cursor CURSOR FOR  ';
 	set @StringSQL1 =@StringSQL1+'SELECT distinct (RTRIM(md.prist_obj)+RTRIM(md.id_obj)) AS obj, isnull(md1.period,0) from metad md
 	left join (select distinct (RTRIM(md.prist_obj)+RTRIM(md.id_obj)) AS obj, period from metad md 
@@ -304,8 +304,8 @@ Label_:
 
 	WHILE @@FETCH_STATUS = 0  
 	BEGIN  
-	--удаляем элементы каждого подчиненного справочника
-	--сначала период. реквизиты
+	--СѓРґР°Р»СЏРµРј СЌР»РµРјРµРЅС‚С‹ РєР°Р¶РґРѕРіРѕ РїРѕРґС‡РёРЅРµРЅРЅРѕРіРѕ СЃРїСЂР°РІРѕС‡РЅРёРєР°
+	--СЃРЅР°С‡Р°Р»Р° РїРµСЂРёРѕРґ. СЂРµРєРІРёР·РёС‚С‹
 		if @period=1 
 			begin
 				set @StringSQL1=@prist+' from _1SCONST where OBJID in (SELECT distinct id FROM '+@obj+' '+@obj+' 
@@ -314,7 +314,7 @@ Label_:
 				print @StringSQL1;
 				exec(@StringSQL1);
 			end	
-	--теперь подч. спр-к
+	--С‚РµРїРµСЂСЊ РїРѕРґС‡. СЃРїСЂ-Рє
 		set @StringSQL1 ='';
 		set @StringSQL1 =@StringSQL1+@prist1+'  FROM '+@obj+'  WHERE '+@obj+'.PARENTEXT IN ( SELECT ID FROM #ft) ';
 		print @StringSQL1;
@@ -322,8 +322,8 @@ Label_:
 		FETCH NEXT FROM user_cursor  
 		INTO @obj,@period;
 	END  
-	--удаляем элементы спр-ка, которые есть в фильтре
-	--сначала период. реквизиты
+	--СѓРґР°Р»СЏРµРј СЌР»РµРјРµРЅС‚С‹ СЃРїСЂ-РєР°, РєРѕС‚РѕСЂС‹Рµ РµСЃС‚СЊ РІ С„РёР»СЊС‚СЂРµ
+	--СЃРЅР°С‡Р°Р»Р° РїРµСЂРёРѕРґ. СЂРµРєРІРёР·РёС‚С‹
 	--select id from #ft
 	if @period2=1
 		begin
@@ -334,15 +334,15 @@ Label_:
 			print @StringSQL1;
 			exec(@StringSQL1);
 		end
-	--теперь осн. спр-к	
+	--С‚РµРїРµСЂСЊ РѕСЃРЅ. СЃРїСЂ-Рє	
 	set @StringSQL1=@prist+' FROM '+@obj2+' 
 	WHERE ID IN (SELECT ID FROM #ft)'+@dob2_;
 	print @StringSQL1;
 	exec(@StringSQL1);
 	DROP TABLE #ft
-	if @vid='''ТМЦ'''
+	if @vid='''РўРњР¦'''
 	begin 
-		--удаляем пустые группы спр-ка "ТМЦ"
+		--СѓРґР°Р»СЏРµРј РїСѓСЃС‚С‹Рµ РіСЂСѓРїРїС‹ СЃРїСЂ-РєР° "РўРњР¦"
 		DROP TABLE #ft_TMC
 		set @StringSQL1=@prist+' from SC289 where id IN (
 		select e.id from SC289 e WITH (NOLOCK)
