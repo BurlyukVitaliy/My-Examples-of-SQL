@@ -29,47 +29,6 @@ class Player:
 import random
 
 
-def count_point(subj: ('Dealer', 'Player')) -> int:
-    """
-    The function determines the number of points a player or dealer
-    has depending on the cards in their hand
-    :param subj: ('Dealer', 'Player')
-    :return: (int)
-    """
-
-    point = 0
-    is_there_an_ace = False
-    is_there_an_joker = False
-
-    for i_card in subj.list_cards:
-        point += i_card.rang
-        if i_card.name[0:1] == 'Т':
-            is_there_an_ace = True
-        if i_card.name[0:1] == 'J':
-            is_there_an_joker = True
-
-    # if ace, then 1 or 11 points depending on the situation
-    if is_there_an_ace:
-        point += 10  # 1 point is already in the rank
-        if point > 21:
-            point -= 10
-
-    # if a joker, then replaces any card. Points can be from 1 to 11 depending on the situation.
-    if is_there_an_joker:
-        add_point = 0
-        if 0 < 21 - point <= 11:
-            add_point = 21 - point
-        elif 21 - point > 0:
-            add_point = 11
-        point += add_point
-
-    # if there are more than 21 points, then bust, points are reset to zero
-    if point > 21:
-        point = 0
-
-    return point
-
-
 class Card:
     """ Class Playing card from the deck """
 
@@ -194,6 +153,47 @@ class Dealer:
 
         print('У дилера: {}'.format(' '.join([i_card.name for i_card in self.list_cards])))
 
+    @staticmethod
+    def count_point(subj: ('Dealer', 'Player')) -> int:
+        """
+        The function determines the number of points a player or dealer
+        has depending on the cards in their hand
+        :param subj: ('Dealer', 'Player')
+        :return: (int)
+        """
+
+        point = 0
+        is_there_an_ace = False
+        is_there_an_joker = False
+
+        for i_card in subj.list_cards:
+            point += i_card.rang
+            if i_card.name[0:1] == 'Т':
+                is_there_an_ace = True
+            if i_card.name[0:1] == 'J':
+                is_there_an_joker = True
+
+        # if ace, then 1 or 11 points depending on the situation
+        if is_there_an_ace:
+            point += 10  # 1 point is already in the rank
+            if point > 21:
+                point -= 10
+
+        # if a joker, then replaces any card. Points can be from 1 to 11 depending on the situation.
+        if is_there_an_joker:
+            add_point = 0
+            if 0 < 21 - point <= 11:
+                add_point = 21 - point
+            elif 21 - point > 0:
+                add_point = 11
+            point += add_point
+
+        # if there are more than 21 points, then bust, points are reset to zero
+        if point > 21:
+            point = 0
+
+        return point
+
     def determine_the_winner(self, card_player: ('Dealer', 'Player')) -> ('Dealer', 'Player'):
         """
         The function of determining the winner in the game
@@ -201,8 +201,8 @@ class Dealer:
         :return: ('Dealer' or 'Player')
         """
 
-        self_point = count_point(self)
-        player_point = count_point(card_player)
+        self_point = self.count_point(self)
+        player_point = self.count_point(card_player)
         if self_point < player_point:
             winner = card_player
         elif self_point > player_point:
