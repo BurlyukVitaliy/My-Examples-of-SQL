@@ -174,9 +174,7 @@ class Dealer:
         """
 
         rand_num = random.randint(0, len(self.deck.list_cards)-1)
-        select_card = self.deck.list_cards[rand_num]
-        subj.list_cards.append(select_card)
-        self.deck.list_cards.remove(select_card)
+        subj.list_cards.append(self.deck.list_cards.pop(rand_num))
 
     def card_distribution(self, card_player: ('Dealer', 'Player')) -> None:
         """
