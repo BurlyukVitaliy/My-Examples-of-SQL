@@ -168,7 +168,7 @@ class Dealer:
 
     def add_card(self, subj: ('Dealer', 'Player')) -> None:
         """
-        Issuance of a card
+        Handing over the card
         :param subj: ('Dealer' or 'Player')
         :return: (None)
         """
