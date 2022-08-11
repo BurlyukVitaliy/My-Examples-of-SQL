@@ -10,4 +10,4 @@ The script deletes documents that are not referenced in database tables. Used af
 Previously, entries in the operational and accounting registers were deleted before a certain date.
 Replaces the standard procedure for deleting records marked for deletion, which takes a very long time
 
-The file task24_6_8_Black_Jack.py is a text mode implementation of Black Jack. There is a condition of the problem and its solution
+The file task_Black_Jack.py is a text mode implementation of Black Jack. There is a condition of the problem and its solution
