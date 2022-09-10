@@ -11,3 +11,5 @@ Previously, entries in the operational and accounting registers were deleted bef
 Replaces the standard procedure for deleting records marked for deletion, which takes a very long time
 
 The file task_Black_Jack.py is a text mode implementation of Black Jack. There is a condition of the problem and its solution
+
+The file QHofstadter.py is the implementation of the Hofstadter sequence
